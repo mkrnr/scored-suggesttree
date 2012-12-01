@@ -25,7 +25,6 @@ import java.util.Map;
  * <p>
  * Class Pair was added to support storing of rank scores.
  * 
- * 
  * @param <V>
  *            the type of rank values
  * 
@@ -62,22 +61,26 @@ public class SuggestTree<V> {
 	 * @throws RuntimeException
 	 *             if any of the specified suggestions are an empty string
 	 */
-	public void build(Map<Pair<V>, V> m, final Comparator<V> c, int k) {
-		Pair<V>[] suggestions = m.keySet().toArray(new Pair[0]);
+	public void build(Map<String, V> m, final Comparator<V> c, int k) {
+		Pair<V>[] suggestions = new Pair[m.size()];
+		int count = 0;
+		for (Map.Entry<String, V> e : m.entrySet()) {
+			suggestions[count] = new Pair<V>(e.getKey(), e.getValue());
+			count++;
+		}
+		Pair<V>[] pairs = suggestions.clone();
 		Arrays.sort(suggestions);
-		Map.Entry<Pair<V>, V>[] a = m.entrySet().toArray(new Map.Entry[0]);
-		Arrays.sort(a, new Comparator<Map.Entry<Pair<V>, V>>() {
+		Arrays.sort(pairs, new Comparator<Pair<V>>() {
 			@Override
-			public int compare(Map.Entry<Pair<V>, V> e1,
-					Map.Entry<Pair<V>, V> e2) {
-				return c.compare(e2.getValue(), e1.getValue());
+			public int compare(Pair<V> e1, Pair<V> e2) {
+				return c.compare(e2.score, e1.score);
 			}
 		});
 		SuggestTree<V> t = new SuggestTree<V>();
 		t.buildTST(suggestions, 0, suggestions.length);
 		t.allocateArrays(t.root, k);
-		for (Map.Entry<Pair<V>, V> e : a) {
-			t.appendToLists(e.getKey(), k);
+		for (Pair<V> e : pairs) {
+			t.appendToLists(e, k);
 		}
 		this.root = t.root;
 		this.nodeCount = t.nodeCount;

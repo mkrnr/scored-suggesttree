@@ -10,7 +10,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.suggesttree.SuggestTree.Node;
-import de.suggesttree.SuggestTree.Pair;
 
 public class SuggestTreeTest {
 	SuggestTree<Integer> s;
@@ -33,26 +32,27 @@ public class SuggestTreeTest {
 	}
 
 	@Test
-	public void testNormal() {
-		HashMap<Pair<Integer>, Integer> suggestions = new HashMap<Pair<Integer>, Integer>();
-		suggestions.put(new Pair<Integer>("tests", 2), 2);
-		suggestions.put(new Pair<Integer>("test", 1), 1);
-		suggestions.put(new Pair<Integer>("tes", 4), 4);
-		suggestions.put(new Pair<Integer>("te", 3), 3);
-		suggestions.put(new Pair<Integer>("t", 5), 5);
-		Comparator<Integer> c = new Comparator<Integer>() {
-
+	public void test1() {
+		HashMap<String, Integer> suggestions = new HashMap<String, Integer>();
+		suggestions.put("tests", 2);
+		suggestions.put("test", 1);
+		suggestions.put("tes", 4);
+		suggestions.put("te", 3);
+		suggestions.put("t", 5);
+		Comparator<Integer> comparator = new Comparator<Integer>() {
 			@Override
 			public int compare(Integer e1, Integer e2) {
 				return Integer.compare(e1, e2);
 			}
 		};
-		this.s.build(suggestions, c, 5);
+		this.s.build(suggestions, comparator, 5);
+
 		Node<Integer> result = this.s.getBestSuggestions("te");
 		System.out.println("te:");
 		for (int i = 0; i < result.listLength(); i++) {
 			System.out.println(result.getSuggestion(i).getString() + " "
 					+ result.getSuggestion(i).getScore());
 		}
+
 	}
 }
